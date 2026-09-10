@@ -1,46 +1,41 @@
-Copy this into your `README.md`:
-
 # LangChain Learning Journey
 
-This repository documents my practical learning journey with **LangChain** and **Google Gemini** using Python.
+This repository documents my hands-on AI learning journey using Python, LangChain, and Google Gemini.
 
-The goal is to understand how AI applications work step by step: from sending a simple fixed prompt to building dynamic, reusable prompts. 
+I am learning how to build AI applications step by step: starting with basic prompts, moving to dynamic prompts, and building practical mini-projects. My next learning phase will focus on LangGraph workflows and agents.
 
-## What I learned
+## What I am learning
 
-- Loading secret API keys using environment variables
-- Connecting Google Gemini with LangChain
-- Sending prompts with `.invoke()`
-- Reading AI responses
-- Understanding the `AIMessage` response type
-- Creating dynamic prompts with `PromptTemplate`
-- Accepting user input for topic, language, and difficulty level
+- Python virtual environments
+- Environment variables and API-key security
+- Google Gemini integration with LangChain
+- Static prompts
+- Dynamic prompts with user input
+- Prompt templates
+- System and human messages
+- Building practical AI applications
 
-## Project files
+## Projects
 
-### `static_prompt.py`
+### 1. Static Prompt
 
-A beginner-friendly example that sends one fixed question to Gemini.
+File: `static_prompt.py`
 
-It demonstrates:
+This example sends a fixed question to Gemini and prints the AI response.
 
-- Loading the Gemini API key from `.env`
+Concepts practiced:
+
+- Loading variables from `.env`
 - Creating a `ChatGoogleGenerativeAI` model
-- Sending a static prompt
-- Printing the response content
-- Printing the response class name
+- Calling a model with `.invoke()`
+- Printing the response text
+- Understanding the `AIMessage` response type
 
-### `dynamic_prompt.py`
+### 2. Dynamic Prompt
 
-An interactive example that creates a prompt from user input.
+File: `dynamic_prompt.py`
 
-The program asks for:
-
-- Topic
-- Language
-- Learning level
-
-It then uses `PromptTemplate` to generate a custom prompt and sends it to Gemini.
+This example asks the user for a topic, language, and learning level. It uses LangChain's `PromptTemplate` to create a customized AI prompt.
 
 Example input:
 
@@ -50,12 +45,41 @@ Enter Language: Hindi
 Enter Level: advanced
 ```
 
+### 3. AI Travel Guide
+
+File: `travel_guide.py`
+
+This mini-project creates a personalized travel plan based on user input.
+
+The user provides:
+
+- Destination
+- Number of days
+- Budget
+- Main interest
+
+The AI generates:
+
+- Places to visit
+- A daily travel schedule
+- Food suggestions
+- Practical travel tips
+
+Example input:
+
+```text
+Enter destination: Goa
+Enter number of days: 5
+Enter budget: High
+Enter main interest: Fishing
+```
+
 ## Setup
 
-### 1. Clone the repository
+### 1. Clone this repository
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/a1108/langchain-learning-journey.git
 cd langchain-learning-journey
 ```
 
@@ -72,31 +96,25 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-### 4. Create a `.env` file
+### 4. Add your Gemini API key
 
-Create a file named `.env` in the project folder:
+Create a `.env` file in the project folder:
 
 ```env
 GOOGLE_API_KEY=your_google_gemini_api_key_here
 ```
 
-Do not upload `.env` to GitHub. It contains your private API key.
+Never upload your `.env` file to GitHub because it contains a private API key.
 
-## Run the examples
-
-Run the static prompt example:
+## Run the projects
 
 ```bash
 python static_prompt.py
-```
-
-Run the dynamic prompt example:
-
-```bash
 python dynamic_prompt.py
+python travel_guide.py
 ```
 
-## Technologies used
+## Technologies Used
 
 - Python
 - LangChain
@@ -104,17 +122,14 @@ python dynamic_prompt.py
 - `langchain-google-genai`
 - `python-dotenv`
 
-## Next steps
+## Next Steps
 
-I plan to continue learning:
-
-- System messages and chat messages
-- Prompt engineering
+- Chat messages and system messages
 - Output parsers
 - Chains
-- LangGraph workflows
+- LangGraph state, nodes, and edges
 - AI agents and tool calling
 
 ## Note
 
-This repository is part of my hands-on AI learning journey. Each example is created to help me understand the practical foundations of building AI applications.
+This repository is part of my practical AI learning journey. Each project is created to understand one concept through hands-on practice.
