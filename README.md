@@ -1,5 +1,3 @@
-Copy this into your `README.md`:
-
 # LangChain Learning Journey
 
 This repository documents my practical learning journey with **LangChain** and **Google Gemini** using Python.
