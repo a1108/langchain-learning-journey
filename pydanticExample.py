@@ -2,63 +2,121 @@ from pydantic import BaseModel, Field, ValidationError
 
 
 class Student(BaseModel):
-    sName: str = Field(min_length=2)
-    sAge: int = Field(ge=5, le=100)
-    aGrade: str = Field(min_length=1)
+    first_name: str = Field(
+        description="Student's first name",
+        min_length=2,
+        max_length=100,
+    )
+    middle_name: str | None = Field(
+        default=None,
+        description="Student's middle name, if available",
+        min_length=2,
+        max_length=100,
+    )
+    last_name: str | None = Field(
+         default=None,
+        description="Student's last name, if available",
+        min_length=2,
+        max_length=100,
+    )
+    age: int = Field(
+        description="Student's age in years",
+        ge=5,
+        le=100,
+    )
+    grade: str = Field(
+        description="Student's academic grade",
+        min_length=1,
+        max_length=10,
+    )
 
 
 class Teacher(BaseModel):
-    tName: str = Field(min_length=2)
-    tAge: int = Field(ge=18, le=100)
-    subject: str = Field(min_length=2)
+    name: str = Field(
+        description="Teacher's name",
+        min_length=2,
+        max_length=100,
+    )
+    age: int = Field(
+        description="Teacher's age in years",
+        ge=18,
+        le=100,
+    )
+    subject: str = Field(
+        description="Subject taught by the teacher",
+        min_length=2,
+        max_length=100,
+    )
 
 
 class School(BaseModel):
-    schoolName: str = Field(min_length=2)
-    schoolID: int = Field(gt=0)
+    name: str = Field(
+        description="School's name",
+        min_length=2,
+        max_length=150,
+    )
+    school_id: int = Field(
+        default=100,
+        description="Unique school identification number",
+        gt=99,
+    )
     students: list[Student]
     teachers: list[Teacher]
 
 
-try:
-    student1 = Student(sName="John", sAge="20", aGrade="A")
-    student2 = Student(sName="Emma", sAge=18, aGrade="A+")
+def main() -> None:
+    try:
+        student1 = Student(
+            first_name="Ankit",
+            middle_name="Kumar",
+            last_name="Gupta",
+            age="20",  # Pydantic converts this string to integer 20.
+            grade="A",
+        )
 
-    teacher1 = Teacher(tName="Alice", tAge=30, subject="Math")
-    teacher2 = Teacher(tName="Robert", tAge=42, subject="Science")
+        student2 = Student(
+            first_name="Sumit",
+            age=18,
+            grade="A+",
+        )
 
-    school = School(
-        schoolName="Greenwood High",
-        schoolID=101,
-        students=[student1, student2],
-        teachers=[teacher1, teacher2],
-    )
+        teacher1 = Teacher(name="DurgaSoft", age=30, subject="Programming")
+        teacher2 = Teacher(name="Rahul", age=42, subject="Science")
 
-    print("Student:")
-    print(student1)
-    print(student1.sName)
-    print(student1.sAge)  # "20" was converted to integer 20
+        school = School(
+            name="DurgaClasses",
+            school_id=101,
+            students=[student1, student2],
+            teachers=[teacher1, teacher2],
+        )
 
-    print("\nTeacher:")
-    print(teacher1)
+        # school_id is omitted, so its default value is 100.
+        school_with_default_id = School(
+            name="DurgaClasses",
+            students=[student1, student2],
+            teachers=[teacher1, teacher2],
+        )
 
-    print("\nSchool:")
-    print(school)
+        print("Student:")
+        print(student1)
 
-    print("\nSchool as dictionary:")
-    print(school.model_dump())
+        print("\nSchool as dictionary:")
+        print(school.model_dump())
 
-    print("\nClass names:")
-    print(type(school).__name__)    # School
-    print(type(student1).__name__)  # Student
-    print(type(teacher1).__name__)  # Teacher
+        print("\nSchool with default ID:")
+        print(school_with_default_id.school_id)  # 100
 
-    print("\n== Error Scenario ==\n")
+        print("\nClass names:")
+        print(type(school).__name__)    # School
+        print(type(student1).__name__)  # Student
+        print(type(teacher1).__name__)  # Teacher
 
-    # This fails because sAge must be 5 or more.
-    invalid_student = Student(sName="John", sAge=4, aGrade="A")
-    print(invalid_student)
+        print("\n== Validation Error Scenario ==")
+        Student(first_name="Ankit", age=4, grade="A")
 
-except ValidationError as error:
-    print("Validation error:")
-    print(error)
+    except ValidationError as error:
+        print(error)
+
+
+if __name__ == "__main__":
+    main()

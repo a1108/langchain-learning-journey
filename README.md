@@ -87,9 +87,34 @@ Concepts practiced:
 - Creating models with `BaseModel`
 - Validating strings and integers with `Field`
 - Using `ge`, `le`, and `gt` validation rules
-- Nested models with `list[Student]` and `list[Teacher]`
+- Creating optional fields with `str | None` and `default=None`
+- Using default values, such as a default school ID
+- Creating nested models with `list[Student]` and `list[Teacher]`
 - Handling invalid input with `ValidationError`
 - Converting a model to a dictionary with `.model_dump()`
+
+Example:
+
+```text
+Student:
+first_name='Ankit' middle_name='Kumar' last_name='Gupta' age=20 grade='A'
+
+School as dictionary:
+{'name': 'DurgaClasses', 'school_id': 101, 'students': [{'first_name': 'Ankit', 'middle_name': 'Kumar', 'last_name': 'Gupta', 'age': 20, 'grade': 'A'}, {'first_name': 'Sumit', 'middle_name': None, 'last_name': None, 'age': 18, 'grade': 'A+'}], 'teachers': [{'name': 'Durga', 'age': 30, 'subject': 'Programming'}, {'name': 'Rahul', 'age': 42, 'subject': 'Science'}]}
+
+School with default ID:
+100
+
+Class names:
+School
+Student
+Teacher
+
+== Validation Error Scenario ==
+1 validation error for Student
+age
+  Input should be greater than or equal to 5 [type=greater_than_equal, input_value=4, input_type=int]
+```
 
 ## Setup
 
