@@ -116,6 +116,33 @@ age
   Input should be greater than or equal to 5 [type=greater_than_equal, input_value=4, input_type=int]
 ```
 
+
+### 5. Candidate Profile Extraction (Structured Output)
+
+File: candidate_extraction.py
+
+This project parses and scrapes unstructured text from user inputs to extract validated applicant details using Pydantic and Gemini.
+
+Concepts practiced:
+
+- Enforcing JSON schema generation using .with_structured_output()
+- Parsing raw text directly into structured Pydantic model instances
+- Validating extracted employee attributes (name, technology, years of experience)
+
+Example:
+
+```text
+Enter employee information: Ankit began his career at Ericsson, joining as a Java Developer on September 15, 2015.
+
+
+Employee Details:
+name='Ankit' 
+technology='Java'
+experience=11
+
+```
+
+Setup
 ## Setup
 
 ### 1. Clone This Repository

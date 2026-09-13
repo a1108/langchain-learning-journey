@@ -14,7 +14,7 @@ class Student(BaseModel):
         max_length=100,
     )
     last_name: str | None = Field(
-         default=None,
+        default=None,
         description="Student's last name, if available",
         min_length=2,
         max_length=100,
@@ -92,16 +92,26 @@ def main() -> None:
 
         # school_id is omitted, so its default value is 100.
         school_with_default_id = School(
-            name="DurgaClasses",
+            name="DurgaSoftClasses",
             students=[student1, student2],
             teachers=[teacher1, teacher2],
         )
 
-        print("Student:")
-        print(student1)
+        print("Student1:")
+        print(student1.first_name)  # Ankit
+        print(student1.middle_name)  # Kumar
+        print(student1.last_name)    # Gupta
+        print(student1.age)          # 20
+        print(student1.grade)        # A
+        print()
 
         print("\nSchool as dictionary:")
-        print(school.model_dump())
+        print(school.model_dump()) #Python dictonary
+        print(type(school.model_dump()).__name__) #<class 'dict'>
+
+        print()
+        print(school.model_dump_json()) #json String
+        print(type(school.model_dump_json()).__name__) #<class 'str'>
 
         print("\nSchool with default ID:")
         print(school_with_default_id.school_id)  # 100
