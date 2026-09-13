@@ -1,10 +1,10 @@
 # LangChain Learning Journey
 
-This repository documents my hands-on AI learning journey using Python, LangChain, and Google Gemini.
+This repository documents my hands-on AI learning journey using Python, LangChain, Google Gemini, and Pydantic.
 
-I am learning how to build AI applications step by step: starting with basic prompts, moving to dynamic prompts, and building practical mini-projects. My next learning phase will focus on LangGraph workflows and agents.
+I am learning to build AI applications step by step: starting with basic prompts, moving to dynamic prompts, and creating practical mini-projects. My next learning phase will focus on LangGraph workflows and AI agents.
 
-## What I am learning
+## What I Am Learning
 
 - Python virtual environments
 - Environment variables and API-key security
@@ -14,6 +14,7 @@ I am learning how to build AI applications step by step: starting with basic pro
 - Prompt templates
 - System and human messages
 - Building practical AI applications
+- Pydantic models and data validation
 
 ## Projects
 
@@ -30,6 +31,7 @@ Concepts practiced:
 - Calling a model with `.invoke()`
 - Printing the response text
 - Understanding the `AIMessage` response type
+- Reading token usage with `response.usage_metadata`
 
 ### 2. Dynamic Prompt
 
@@ -74,29 +76,44 @@ Enter budget: High
 Enter main interest: Fishing
 ```
 
+### 4. School Data Validation with Pydantic
+
+File: `pydantic_school.py`
+
+This example uses Pydantic models to validate student, teacher, and school data.
+
+Concepts practiced:
+
+- Creating models with `BaseModel`
+- Validating strings and integers with `Field`
+- Using `ge`, `le`, and `gt` validation rules
+- Nested models with `list[Student]` and `list[Teacher]`
+- Handling invalid input with `ValidationError`
+- Converting a model to a dictionary with `.model_dump()`
+
 ## Setup
 
-### 1. Clone this repository
+### 1. Clone This Repository
 
 ```bash
 git clone https://github.com/a1108/langchain-learning-journey.git
 cd langchain-learning-journey
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Create and Activate a Virtual Environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install dependencies
+### 3. Install Dependencies
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-### 4. Add your Gemini API key
+### 4. Add Your Gemini API Key
 
 Create a `.env` file in the project folder:
 
@@ -104,14 +121,15 @@ Create a `.env` file in the project folder:
 GOOGLE_API_KEY=your_google_gemini_api_key_here
 ```
 
-Never upload your `.env` file to GitHub because it contains a private API key.
+Never upload your `.env` file to GitHub because it contains your private API key.
 
-## Run the projects
+## Run the Projects
 
 ```bash
 python static_prompt.py
 python dynamic_prompt.py
 python travel_guide.py
+python pydantic_school.py
 ```
 
 ## Technologies Used
@@ -119,6 +137,7 @@ python travel_guide.py
 - Python
 - LangChain
 - Google Gemini API
+- Pydantic
 - `langchain-google-genai`
 - `python-dotenv`
 
