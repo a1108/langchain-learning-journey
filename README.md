@@ -141,8 +141,35 @@ technology='Java'
 experience=11
 
 ```
+### 6. Raw and Structured Output Handling
 
-Setup
+File: `rawWithStructure.py`
+
+This example demonstrates how to capture and inspect both the raw model output and the validated Pydantic object using the `include_raw=True` option.
+
+Concepts practiced:
+
+- Enabling `include_raw=True` in `.with_structured_output()`
+- Accessing raw model output (`result["raw"]`), parsed Pydantic objects (`result["parsed"]`), and runtime parsing errors (`result
+  ["parsing_error"]`)
+- Managing optional fields (`str | None`, `int | None`) with default values of `None` to eliminate model hallucinations
+- Comparing native JSON `null` serialization against Python `None` values
+
+Example:
+
+```text
+Enter employee information: i am ankit and i am also java backend developer
+
+---------- RAW ----------
+content=[{'type': 'text', 'text': '{"name":"ankit","technology":"java backend developer","experience":"null"}', ...}]
+
+---------- PARSED ----------
+name='ankit' technology='java backend developer' experience=None
+
+---------- PARSING ERROR ----------
+None
+```
+
 ## Setup
 
 ### 1. Clone This Repository
@@ -182,6 +209,7 @@ python static_prompt.py
 python dynamic_prompt.py
 python travel_guide.py
 python pydantic_school.py
+python scrapedCandidateEntity.py
 ```
 
 ## Technologies Used
