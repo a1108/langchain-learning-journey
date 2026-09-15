@@ -1,0 +1,59 @@
+from typing import Literal
+from dotenv import load_dotenv
+from pydantic import BaseModel, Field
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+class SupportTicket(BaseModel):
+
+    category: Literal[
+        "billing",
+        "technical",
+        "account",
+        "other"
+    ] = Field(
+        description="Main category of the customer issue"
+    )
+
+    priority: Literal[
+        "low",
+        "medium",
+        "high"
+    ] = Field(
+        description="Priority level of the issue"
+    )
+
+    severity: int = Field(
+        ge=1,
+        le=5,
+        description="Severity from 1 to 5"
+    )
+
+    summary: str = Field(
+        description="Very short summary of the customer issue"
+    )
+load_dotenv()
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-3.6-flash"
+)
+
+structured_llm = llm.with_structured_output(
+    SupportTicket
+)
+
+
+text = input(
+    "Enter customer issue: "
+)
+
+
+result = structured_llm.invoke(text)
+
+
+print("\nSUPPORT TICKET")
+print("------------------")
+
+print("Category :", result.category)
+print("Priority :", result.priority)
+print("Severity :", result.severity)
+print("Summary  :", result.summary)
