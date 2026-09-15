@@ -170,6 +170,32 @@ name='ankit' technology='java backend developer' experience=None
 None
 ```
 
+### 7. Support Ticket Classification with Literal Constraints
+
+File: `supportTicketWithLiteral.py`
+
+This project classifies and structures unstructured customer support requests into categorized, prioritized support tickets using Pydantic `Literal` types and Gemini.
+
+Concepts practiced:
+
+- Restricting model categorical outputs using Python's `typing.Literal`
+- Applying range validation (`ge`, `le`) to numerical scoring fields
+- Generating concise summaries while performing multi-label classification
+- Building automated triage pipelines with `.with_structured_output()`
+
+Example:
+
+```text
+Enter customer issue: I forgot my password and cannot login to my account.
+
+SUPPORT TICKET
+------------------
+Category : account
+Priority : medium
+Severity : 3
+Summary  : User forgot password and cannot log into account
+```
+
 ## Setup
 
 ### 1. Clone This Repository
