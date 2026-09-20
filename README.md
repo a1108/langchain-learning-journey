@@ -15,6 +15,7 @@ I am learning to build AI applications step by step: starting with basic prompts
 - LangChain Expression Language (LCEL) and chaining with the `|` operator
 - Output parsers: string output and structured output
 - Batch processing with `chain.batch()`
+- Streaming responses with `chain.stream()`
 - System and human messages
 - Building practical AI applications
 - Pydantic models and data validation
@@ -201,7 +202,7 @@ Summary  : User forgot password and cannot log into account
 
 ### 8. LangChain Expression Language (LCEL) Chain
 
-File: `langChainExpressionLanguage.py`
+File: `lcel_chain.py`
 
 This example asks the user for a topic, language, and learning level, then builds a chain using LangChain Expression Language (LCEL). A `PromptTemplate` with default values is piped into Gemini with the `|` operator, and the whole chain is run with a single `.invoke()` call.
 
@@ -257,7 +258,7 @@ AIMessage
 
 ### 10. Batch Processing with an LCEL Chain
 
-File: `LCELBatch.py`
+File: `batch_chain.py`
 
 This example builds a complete chain with a prompt template, Gemini, and `StrOutputParser`, then runs it on several inputs in one call using `.batch()`. Each input is a topic (Python, Java, SQL), and the chain returns one plain-text answer per topic.
 
@@ -282,6 +283,26 @@ Example output:
 
 list
 RunnableSequence
+```
+
+### 11. Streaming Responses
+
+File: `stream_chain.py`
+
+This example asks the user for a topic and streams the answer as it is generated, instead of waiting for the full response. It uses the same `prompt_template | llm | parser` chain and prints each chunk as it arrives with `chain.stream()`.
+
+Concepts practiced:
+
+- Reusing an LCEL chain with `StrOutputParser`, so each chunk is plain text
+- Collecting a topic with `input()` and passing it to the chain
+- Streaming with `chain.stream()` and looping over the chunks
+- Printing chunks as they arrive with `print(chunk, end="", flush=True)`
+- Understanding the difference between `.invoke()` (one full response), `.batch()` (many inputs), and `.stream()` (a response in pieces)
+
+Example input:
+
+```text
+Enter your topic name: Python
 ```
 
 ## Concept Notes: Output Parsers
