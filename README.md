@@ -13,6 +13,7 @@ I am learning to build AI applications step by step: starting with basic prompts
 - Dynamic prompts with user input
 - Prompt templates
 - LangChain Expression Language (LCEL) and chaining with the `|` operator
+- Output parsers: string output and structured output
 - System and human messages
 - Building practical AI applications
 - Pydantic models and data validation
@@ -226,6 +227,107 @@ AIMessage
 RunnableSequence
 ```
 
+### 9. String Output Parser
+
+File: `str_output_parser.py`
+
+This example calls Gemini with a fixed question, then passes the model response through `StrOutputParser` to compare the raw `AIMessage` with the parsed plain string.
+
+Concepts practiced:
+
+- Creating a parser with `StrOutputParser()`
+- Running a parser on its own with `parser.invoke(llm_response)`, without building a chain
+- Converting an `AIMessage` into a plain Python `str`
+- Comparing the raw model response with the parsed response
+- Confirming the types with `type(...).__name__`
+
+Example output:
+
+```text
+==============parser_response==================
+Python is ...
+============parser_response type====================
+str
+==============llm_response==================
+content=[{'type': 'text', 'text': 'Python is ...', ...}] ...
+============llm_response type====================
+AIMessage
+```
+
+## Concept Notes: Output Parsers
+
+### What is a parser?
+
+When a model answers, LangChain gives back an `AIMessage` object. It holds the text, but also metadata such as token usage, so it is not always the easiest thing to work with.
+
+An **output parser** is a step placed after the model in a chain. It takes the raw model response and converts it into a format the rest of the program can use directly, such as a plain string or a validated Python object.
+
+```text
+prompt | llm | parser
+```
+
+The prompt prepares the input, the model generates the answer, and the parser cleans up the answer.
+
+### 1. String Output Parser
+
+`StrOutputParser` converts the `AIMessage` into a plain Python `str`.
+
+```python
+from langchain_core.output_parsers import StrOutputParser
+
+chain = prompt_template | llm | StrOutputParser()
+result = chain.invoke({"topic": "SQL", "language": "Hindi", "level": "advanced"})
+
+print(result)        # already a string, no .text or .content needed
+```
+
+Use it when:
+
+- The answer is simple text, such as an explanation or a summary
+- You want to print the answer or save it directly
+- You want to pass the text into the next prompt in a longer chain
+
+### 2. Structured Output Parser
+
+A structured output parser converts the model's text into a validated **Pydantic object** instead of a plain string. `PydanticOutputParser` is the main example.
+
+```python
+from langchain_core.output_parsers import PydanticOutputParser
+
+parser = PydanticOutputParser(pydantic_object=Employee)
+
+prompt = PromptTemplate.from_template(
+    "Extract the employee details.\n{format_instructions}\n\n{text}",
+    partial_variables={"format_instructions": parser.get_format_instructions()},
+)
+
+chain = prompt | llm | parser
+result = chain.invoke({"text": text})   # result is an Employee object
+```
+
+How it works:
+
+- `get_format_instructions()` produces text that tells the model which JSON format to return, and this is added to the prompt
+- The parser reads the model's JSON response and builds the Pydantic model from it
+- If the response does not match the model, parsing fails with an error instead of passing bad data along
+
+Use it when:
+
+- You need specific fields, such as name, technology, or experience
+- You want type checks and validation rules on the output
+- Other code will use the result as an object, not as free text
+
+This is closely related to `.with_structured_output()` used in projects 5, 6, and 7. Both give validated Pydantic objects. The difference is that `.with_structured_output()` uses the model's built-in structured output support, so no format instructions are needed in the prompt.
+
+### Quick comparison
+
+| | String Output Parser | Structured Output Parser |
+|---|---|---|
+| Returns | Plain `str` | Pydantic object |
+| Validation | None | Types and rules from the model |
+| Best for | Explanations, summaries, chat text | Extraction, classification, data for code |
+| Fails on bad output | No | Yes, raises a parsing error |
+
 ## Setup
 
 ### 1. Clone This Repository
@@ -280,7 +382,6 @@ python scrapedCandidateEntity.py
 ## Next Steps
 
 - Chat messages and system messages
-- Output parsers
 - Multi-step chains
 - LangGraph state, nodes, and edges
 - AI agents and tool calling
