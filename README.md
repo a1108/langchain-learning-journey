@@ -12,6 +12,7 @@ I am learning to build AI applications step by step: starting with basic prompts
 - Static prompts
 - Dynamic prompts with user input
 - Prompt templates
+- LangChain Expression Language (LCEL) and chaining with the `|` operator
 - System and human messages
 - Building practical AI applications
 - Pydantic models and data validation
@@ -196,6 +197,35 @@ Severity : 3
 Summary  : User forgot password and cannot log into account
 ```
 
+### 8. LangChain Expression Language (LCEL) Chain
+
+File: `langChainExpressionLanguage.py`
+
+This example asks the user for a topic, language, and learning level, then builds a chain using LangChain Expression Language (LCEL). A `PromptTemplate` with default values is piped into Gemini with the `|` operator, and the whole chain is run with a single `.invoke()` call.
+
+Concepts practiced:
+
+- Composing components with the LCEL `|` operator (`prompt_template | llm`)
+- Setting default values with `partial_variables` (topic: Python, language: English, level: beginner)
+- Overriding those defaults by passing values to `chain.invoke()`
+- Running a chain with a dictionary of inputs
+- Comparing the response type (`AIMessage`) with the chain type (`RunnableSequence`)
+
+Example input:
+
+```text
+Enter Topic: SQL
+Enter Language: Hindi
+Enter Level: advanced
+```
+
+The script also prints the type names at the end:
+
+```text
+AIMessage
+RunnableSequence
+```
+
 ## Setup
 
 ### 1. Clone This Repository
@@ -251,7 +281,7 @@ python scrapedCandidateEntity.py
 
 - Chat messages and system messages
 - Output parsers
-- Chains
+- Multi-step chains
 - LangGraph state, nodes, and edges
 - AI agents and tool calling
 
