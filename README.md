@@ -14,6 +14,7 @@ I am learning to build AI applications step by step: starting with basic prompts
 - Prompt templates
 - LangChain Expression Language (LCEL) and chaining with the `|` operator
 - Output parsers: string output and structured output
+- Batch processing with `chain.batch()`
 - System and human messages
 - Building practical AI applications
 - Pydantic models and data validation
@@ -252,6 +253,35 @@ str
 content=[{'type': 'text', 'text': 'Python is ...', ...}] ...
 ============llm_response type====================
 AIMessage
+```
+
+### 10. Batch Processing with an LCEL Chain
+
+File: `LCELBatch.py`
+
+This example builds a complete chain with a prompt template, Gemini, and `StrOutputParser`, then runs it on several inputs in one call using `.batch()`. Each input is a topic (Python, Java, SQL), and the chain returns one plain-text answer per topic.
+
+Concepts practiced:
+
+- Building a three-step LCEL chain: `prompt_template | llm | parser`
+- Setting a default topic with `partial_variables`
+- Passing a list of input dictionaries to `chain.batch(inputs)`
+- Getting back a list of parsed strings, one per input, in the same order
+- Looping over the results to print each answer
+- Confirming the types: `list` for the batch response and `RunnableSequence` for the chain
+
+Example output:
+
+```text
+<5 short points about Python>
+-----------------------------------------------
+<5 short points about Java>
+-----------------------------------------------
+<5 short points about SQL>
+-----------------------------------------------
+
+list
+RunnableSequence
 ```
 
 ## Concept Notes: Output Parsers
