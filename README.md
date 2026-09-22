@@ -2,7 +2,9 @@
 
 This repository documents my hands-on AI learning journey using Python, LangChain, Google Gemini, and Pydantic.
 
-I am learning to build AI applications step by step: starting with basic prompts, moving to dynamic prompts, and creating practical mini-projects. My next learning phase will focus on LangGraph workflows and AI agents.
+I am learning to build AI applications step by step: starting with basic prompts, moving to dynamic prompts, output parsing, LCEL chains, multi-step workflows, and practical mini-projects. My next learning phase will focus on LangGraph workflows and AI agents.
+
+---
 
 ## What I Am Learning
 
@@ -13,12 +15,18 @@ I am learning to build AI applications step by step: starting with basic prompts
 - Dynamic prompts with user input
 - Prompt templates
 - LangChain Expression Language (LCEL) and chaining with the `|` operator
+- Runnable and RunnableSequence concepts
+- RunnableLambda for data transformation
 - Output parsers: string output and structured output
+- Multi-step chains with multiple LLM calls
+- Passing outputs between chain steps
 - Batch processing with `chain.batch()`
 - Streaming responses with `chain.stream()`
 - System and human messages
 - Building practical AI applications
 - Pydantic models and data validation
+
+---
 
 ## Projects
 
@@ -37,6 +45,8 @@ Concepts practiced:
 - Understanding the `AIMessage` response type
 - Reading token usage with `response.usage_metadata`
 
+---
+
 ### 2. Dynamic Prompt
 
 File: `dynamic_prompt.py`
@@ -50,6 +60,10 @@ Enter Topic: SQL
 Enter Language: Hindi
 Enter Level: advanced
 ```
+
+The values entered by the user are passed to the prompt template and used to generate a customized explanation.
+
+---
 
 ### 3. AI Travel Guide
 
@@ -80,6 +94,8 @@ Enter budget: High
 Enter main interest: Fishing
 ```
 
+---
+
 ### 4. School Data Validation with Pydantic
 
 File: `pydantic_school.py`
@@ -101,50 +117,60 @@ Example:
 
 ```text
 Student:
+
 first_name='Ankit' middle_name='Kumar' last_name='Gupta' age=20 grade='A'
 
 School as dictionary:
+
 {'name': 'DurgaClasses', 'school_id': 101, 'students': [{'first_name': 'Ankit', 'middle_name': 'Kumar', 'last_name': 'Gupta', 'age': 20, 'grade': 'A'}, {'first_name': 'Sumit', 'middle_name': None, 'last_name': None, 'age': 18, 'grade': 'A+'}], 'teachers': [{'name': 'Durga', 'age': 30, 'subject': 'Programming'}, {'name': 'Rahul', 'age': 42, 'subject': 'Science'}]}
 
 School with default ID:
+
 100
 
 Class names:
+
 School
 Student
 Teacher
 
 == Validation Error Scenario ==
+
 1 validation error for Student
+
 age
-  Input should be greater than or equal to 5 [type=greater_than_equal, input_value=4, input_type=int]
+
+Input should be greater than or equal to 5 [type=greater_than_equal, input_value=4, input_type=int]
 ```
 
+---
 
 ### 5. Candidate Profile Extraction (Structured Output)
 
-File: candidate_extraction.py
+File: `candidate_extraction.py`
 
 This project parses and scrapes unstructured text from user inputs to extract validated applicant details using Pydantic and Gemini.
 
 Concepts practiced:
 
-- Enforcing JSON schema generation using .with_structured_output()
+- Enforcing JSON schema generation using `.with_structured_output()`
 - Parsing raw text directly into structured Pydantic model instances
-- Validating extracted employee attributes (name, technology, years of experience)
+- Validating extracted employee attributes such as name, technology, and years of experience
 
 Example:
 
 ```text
 Enter employee information: Ankit began his career at Ericsson, joining as a Java Developer on September 15, 2015.
 
-
 Employee Details:
-name='Ankit' 
+
+name='Ankit'
 technology='Java'
 experience=11
-
 ```
+
+---
+
 ### 6. Raw and Structured Output Handling
 
 File: `rawWithStructure.py`
@@ -154,9 +180,10 @@ This example demonstrates how to capture and inspect both the raw model output a
 Concepts practiced:
 
 - Enabling `include_raw=True` in `.with_structured_output()`
-- Accessing raw model output (`result["raw"]`), parsed Pydantic objects (`result["parsed"]`), and runtime parsing errors (`result
-  ["parsing_error"]`)
-- Managing optional fields (`str | None`, `int | None`) with default values of `None` to eliminate model hallucinations
+- Accessing raw model output with `result["raw"]`
+- Accessing parsed Pydantic objects with `result["parsed"]`
+- Accessing runtime parsing errors with `result["parsing_error"]`
+- Managing optional fields such as `str | None` and `int | None` with default values of `None`
 - Comparing native JSON `null` serialization against Python `None` values
 
 Example:
@@ -165,14 +192,19 @@ Example:
 Enter employee information: i am ankit and i am also java backend developer
 
 ---------- RAW ----------
+
 content=[{'type': 'text', 'text': '{"name":"ankit","technology":"java backend developer","experience":"null"}', ...}]
 
 ---------- PARSED ----------
+
 name='ankit' technology='java backend developer' experience=None
 
 ---------- PARSING ERROR ----------
+
 None
 ```
+
+---
 
 ### 7. Support Ticket Classification with Literal Constraints
 
@@ -194,24 +226,30 @@ Enter customer issue: I forgot my password and cannot login to my account.
 
 SUPPORT TICKET
 ------------------
+
 Category : account
 Priority : medium
 Severity : 3
 Summary  : User forgot password and cannot log into account
 ```
 
+---
+
 ### 8. LangChain Expression Language (LCEL) Chain
 
 File: `lcel_chain.py`
 
-This example asks the user for a topic, language, and learning level, then builds a chain using LangChain Expression Language (LCEL). A `PromptTemplate` with default values is piped into Gemini with the `|` operator, and the whole chain is run with a single `.invoke()` call.
+This example asks the user for a topic, language, and learning level, then builds a chain using LangChain Expression Language (LCEL).
+
+A `PromptTemplate` with default values is piped into Gemini with the `|` operator, and the whole chain is run with a single `.invoke()` call.
 
 Concepts practiced:
 
 - Composing components with the LCEL `|` operator (`prompt_template | llm`)
-- Setting default values with `partial_variables` (topic: Python, language: English, level: beginner)
+- Setting default values with `partial_variables`
 - Overriding those defaults by passing values to `chain.invoke()`
 - Running a chain with a dictionary of inputs
+- Understanding that LCEL composition creates a `RunnableSequence`
 - Comparing the response type (`AIMessage`) with the chain type (`RunnableSequence`)
 
 Example input:
@@ -226,8 +264,11 @@ The script also prints the type names at the end:
 
 ```text
 AIMessage
+
 RunnableSequence
 ```
+
+---
 
 ### 9. String Output Parser
 
@@ -247,20 +288,31 @@ Example output:
 
 ```text
 ==============parser_response==================
+
 Python is ...
+
 ============parser_response type====================
+
 str
+
 ==============llm_response==================
+
 content=[{'type': 'text', 'text': 'Python is ...', ...}] ...
+
 ============llm_response type====================
+
 AIMessage
 ```
+
+---
 
 ### 10. Batch Processing with an LCEL Chain
 
 File: `batch_chain.py`
 
-This example builds a complete chain with a prompt template, Gemini, and `StrOutputParser`, then runs it on several inputs in one call using `.batch()`. Each input is a topic (Python, Java, SQL), and the chain returns one plain-text answer per topic.
+This example builds a complete chain with a prompt template, Gemini, and `StrOutputParser`, then runs it on several inputs in one call using `.batch()`.
+
+Each input is a topic such as Python, Java, or SQL, and the chain returns one plain-text answer per topic.
 
 Concepts practiced:
 
@@ -276,20 +328,27 @@ Example output:
 ```text
 <5 short points about Python>
 -----------------------------------------------
+
 <5 short points about Java>
 -----------------------------------------------
+
 <5 short points about SQL>
 -----------------------------------------------
 
 list
+
 RunnableSequence
 ```
+
+---
 
 ### 11. Streaming Responses
 
 File: `stream_chain.py`
 
-This example asks the user for a topic and streams the answer as it is generated, instead of waiting for the full response. It uses the same `prompt_template | llm | parser` chain and prints each chunk as it arrives with `chain.stream()`.
+This example asks the user for a topic and streams the answer as it is generated, instead of waiting for the full response.
+
+It uses the same `prompt_template | llm | parser` chain and prints each chunk as it arrives with `chain.stream()`.
 
 Concepts practiced:
 
@@ -305,6 +364,160 @@ Example input:
 Enter your topic name: Python
 ```
 
+---
+
+### 12. Multi-Step RunnableSequence Chain
+
+File: `multi_step_chain.py`
+
+This example demonstrates how to build a multi-step LangChain pipeline using `RunnableSequence`.
+
+The chain performs two LLM calls:
+
+1. The first Gemini model explains a topic for a beginner.
+2. The explanation is converted into a string using `StrOutputParser`.
+3. `RunnableLambda` transforms the string into the dictionary required by the next prompt.
+4. The second Gemini model uses that explanation to generate two multiple-choice questions (MCQs).
+5. A second `StrOutputParser` converts the final `AIMessage` into a plain Python string.
+
+This demonstrates how the output of one LLM step can become the input to another LLM step.
+
+Concepts practiced:
+
+- Creating a multi-step chain with `RunnableSequence`
+- Calling multiple LLMs sequentially
+- Using `StrOutputParser` between LLM steps
+- Using `RunnableLambda` for data transformation
+- Passing output from one model call into the next prompt
+- Building dependent multi-step workflows
+- Understanding how data flows between `Runnable` components
+- Separating prompt preparation, model execution, parsing, and transformation
+
+#### Chain Flow
+
+```text
+Input
+  ↓
+Explanation Prompt
+  ↓
+Gemini Model 1
+  ↓
+StrOutputParser
+  ↓
+RunnableLambda
+  ↓
+{"content": explanation}
+  ↓
+Quiz Prompt
+  ↓
+Gemini Model 2
+  ↓
+StrOutputParser
+  ↓
+Final MCQs
+```
+
+The chain is explicitly created using `RunnableSequence`:
+
+```python
+chain = RunnableSequence(
+    explanation_prompt,
+    model1,
+    parser,
+    prepare_quiz_input,
+    quiz_prompt,
+    model2,
+    parser
+)
+```
+
+The first model produces an explanation.
+
+`StrOutputParser` converts the `AIMessage` returned by the model into a plain string.
+
+Then `RunnableLambda` transforms that string into the dictionary expected by the next prompt:
+
+```python
+prepare_quiz_input = RunnableLambda(
+    lambda content: {"content": content}
+)
+```
+
+The resulting data looks conceptually like:
+
+```text
+"Java is a programming language..."
+```
+
+becomes:
+
+```python
+{
+    "content": "Java is a programming language..."
+}
+```
+
+That dictionary is then consumed by the quiz prompt:
+
+```text
+Based only on the following content,
+generate 2 MCQs.
+
+Content:
+
+{content}
+```
+
+The complete data flow is:
+
+```text
+{"topic": "Java"}
+       ↓
+Explanation Prompt
+       ↓
+Gemini Model 1
+       ↓
+AIMessage
+       ↓
+StrOutputParser
+       ↓
+"Java is a programming language..."
+       ↓
+RunnableLambda
+       ↓
+{"content": "Java is a programming language..."}
+       ↓
+Quiz Prompt
+       ↓
+Gemini Model 2
+       ↓
+AIMessage
+       ↓
+StrOutputParser
+       ↓
+Final MCQs
+```
+
+The chain is invoked with:
+
+```python
+responses = chain.invoke({"topic": "Java"})
+```
+
+This example is important because it demonstrates that a LangChain workflow does not have to be limited to:
+
+```text
+Prompt → Model → Parser
+```
+
+It can also contain multiple models and custom transformation steps:
+
+```text
+Prompt → Model → Parser → Transform → Prompt → Model → Parser
+```
+
+---
+
 ## Concept Notes: Output Parsers
 
 ### What is a parser?
@@ -319,6 +532,8 @@ prompt | llm | parser
 
 The prompt prepares the input, the model generates the answer, and the parser cleans up the answer.
 
+---
+
 ### 1. String Output Parser
 
 `StrOutputParser` converts the `AIMessage` into a plain Python `str`.
@@ -327,7 +542,12 @@ The prompt prepares the input, the model generates the answer, and the parser cl
 from langchain_core.output_parsers import StrOutputParser
 
 chain = prompt_template | llm | StrOutputParser()
-result = chain.invoke({"topic": "SQL", "language": "Hindi", "level": "advanced"})
+
+result = chain.invoke({
+    "topic": "SQL",
+    "language": "Hindi",
+    "level": "advanced"
+})
 
 print(result)        # already a string, no .text or .content needed
 ```
@@ -337,6 +557,8 @@ Use it when:
 - The answer is simple text, such as an explanation or a summary
 - You want to print the answer or save it directly
 - You want to pass the text into the next prompt in a longer chain
+
+---
 
 ### 2. Structured Output Parser
 
@@ -349,10 +571,13 @@ parser = PydanticOutputParser(pydantic_object=Employee)
 
 prompt = PromptTemplate.from_template(
     "Extract the employee details.\n{format_instructions}\n\n{text}",
-    partial_variables={"format_instructions": parser.get_format_instructions()},
+    partial_variables={
+        "format_instructions": parser.get_format_instructions()
+    },
 )
 
 chain = prompt | llm | parser
+
 result = chain.invoke({"text": text})   # result is an Employee object
 ```
 
@@ -368,9 +593,13 @@ Use it when:
 - You want type checks and validation rules on the output
 - Other code will use the result as an object, not as free text
 
-This is closely related to `.with_structured_output()` used in projects 5, 6, and 7. Both give validated Pydantic objects. The difference is that `.with_structured_output()` uses the model's built-in structured output support, so no format instructions are needed in the prompt.
+This is closely related to `.with_structured_output()` used in projects 5, 6, and 7. Both give validated Pydantic objects.
 
-### Quick comparison
+The difference is that `.with_structured_output()` uses the model's built-in structured output support, so no format instructions are needed in the prompt.
+
+---
+
+### Quick Comparison
 
 | | String Output Parser | Structured Output Parser |
 |---|---|---|
@@ -378,6 +607,86 @@ This is closely related to `.with_structured_output()` used in projects 5, 6, an
 | Validation | None | Types and rules from the model |
 | Best for | Explanations, summaries, chat text | Extraction, classification, data for code |
 | Fails on bad output | No | Yes, raises a parsing error |
+
+---
+
+## Concept Notes: RunnableSequence and RunnableLambda
+
+### RunnableSequence
+
+`RunnableSequence` represents a sequence of Runnable components executed one after another.
+
+For example:
+
+```python
+chain = RunnableSequence(
+    prompt,
+    llm,
+    parser
+)
+```
+
+This is conceptually similar to LCEL composition:
+
+```python
+chain = prompt | llm | parser
+```
+
+The major idea is that the output of one Runnable becomes the input to the next Runnable.
+
+A more complex sequence can contain multiple models, parsers, and transformation steps:
+
+```text
+Runnable
+   ↓
+Runnable
+   ↓
+Runnable
+   ↓
+Runnable
+   ↓
+Runnable
+```
+
+---
+
+### RunnableLambda
+
+`RunnableLambda` allows normal Python logic to be used as a Runnable inside a LangChain chain.
+
+Example:
+
+```python
+prepare_quiz_input = RunnableLambda(
+    lambda content: {"content": content}
+)
+```
+
+It receives the output from the previous step and transforms it into the format required by the next step.
+
+This is useful when the output from one component does not directly match the input expected by the next component.
+
+For example:
+
+```text
+Previous step:
+
+"Java is a programming language..."
+
+        ↓
+
+RunnableLambda
+
+        ↓
+
+{
+    "content": "Java is a programming language..."
+}
+```
+
+This allows custom Python transformations to become part of the LangChain pipeline.
+
+---
 
 ## Setup
 
@@ -411,6 +720,8 @@ GOOGLE_API_KEY=your_google_gemini_api_key_here
 
 Never upload your `.env` file to GitHub because it contains your private API key.
 
+---
+
 ## Run the Projects
 
 ```bash
@@ -419,7 +730,14 @@ python dynamic_prompt.py
 python travel_guide.py
 python pydantic_school.py
 python scrapedCandidateEntity.py
+python lcel_chain.py
+python str_output_parser.py
+python batch_chain.py
+python stream_chain.py
+python multi_step_chain.py
 ```
+
+---
 
 ## Technologies Used
 
@@ -430,12 +748,16 @@ python scrapedCandidateEntity.py
 - `langchain-google-genai`
 - `python-dotenv`
 
+---
+
 ## Next Steps
 
 - Chat messages and system messages
-- Multi-step chains
+- More complex multi-step chains
 - LangGraph state, nodes, and edges
 - AI agents and tool calling
+
+---
 
 ## Note
 
