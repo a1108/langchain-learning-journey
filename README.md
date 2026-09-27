@@ -678,11 +678,9 @@ RunnableLambda
 Dictionary Input
        ↓
 RunnableParallel
-       ├── Summary
-       ├── Quiz
-       ├── Social Post
-       ├── Interview Questions
-       └── Description
+    ┌──┼────┬───────┐
+    ↓  ↓    ↓       ↓
+ Summary Quiz Social Interview
 ```
 
 #### Model Call Count
@@ -771,6 +769,113 @@ Parallel:
        ┌→ B
 A ─────┼→ C
        └→ D
+```
+
+---
+
+### 14. Stateful Conversation
+
+File: `stateful_chat.py`
+
+This example demonstrates the difference between invoking an LLM without conversation history and invoking it with conversation history.
+
+The same question is asked in both cases:
+
+```text
+What is my name?
+```
+
+The model is instructed to say "I don't know" if the name is not available in the supplied conversation.
+
+#### Without History
+
+The model receives only the current question:
+
+```python
+response1 = llm.invoke(
+    [question]
+)
+```
+
+Since no previous conversation is supplied, the model does not know the user's name.
+
+Example output:
+
+```text
+WITHOUT HISTORY
+---------------
+
+I don't know
+```
+
+#### With History
+
+The previous conversation is explicitly supplied:
+
+```python
+messages = [
+    HumanMessage(
+        content="My name is Ankit."
+    ),
+    AIMessage(
+        content="Nice to meet you."
+    ),
+    question
+]
+
+response2 = llm.invoke(messages)
+```
+
+The model now receives:
+
+```text
+Human: My name is Ankit.
+AI: Nice to meet you.
+Human: What is my name?
+```
+
+Therefore, it can answer:
+
+```text
+WITH HISTORY
+------------
+
+Your name is Ankit.
+```
+
+#### Key Concept
+
+The LLM does not automatically remember previous `invoke()` calls. The application must provide the relevant conversation history as part of the input.
+
+Conceptually:
+
+```text
+WITHOUT HISTORY
+
+User
+  ↓
+"What is my name?"
+  ↓
+LLM
+  ↓
+"I don't know"
+```
+
+With history:
+
+```text
+WITH HISTORY
+
+Conversation History
+  ├── My name is Ankit.
+  └── Nice to meet you.
+        +
+Current Question
+  └── What is my name?
+  ↓
+LLM
+  ↓
+"Your name is Ankit."
 ```
 
 ---
@@ -1122,6 +1227,7 @@ python batch_chain.py
 python stream_chain.py
 python multi_step_chain.py
 python runnable_sequence_parallel.py
+python stateful_chat.py
 ```
 
 ---
@@ -1139,7 +1245,6 @@ python runnable_sequence_parallel.py
 
 ## Next Steps
 
-- Chat messages and system messages
 - More complex multi-step chains
 - More LCEL composition patterns
 - LangGraph state, nodes, and edges
