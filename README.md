@@ -879,7 +879,7 @@ Current Question
   └── What is my name?
   ↓
 LLM
-  ↓
+  ↓https://github.com/a1108/langchain-learning-journey/blob/main/README.md
 "Your name is Ankit."
 ```
 
@@ -887,7 +887,7 @@ LLM
 
 ### 15. Multi-User AI Chatbot with Supabase Persistence
 
-File: `supabase_chatbot.py` (save the supplied chatbot script with this filename)
+File: `supabase_chatbot.py`
 
 This project combines a command-line signup/login flow with a LangChain chatbot powered by Google Gemini. It uses `RunnableWithMessageHistory` to attach conversation history to a session and a custom `BaseChatMessageHistory` implementation to load and save serialized messages in Supabase.
 
