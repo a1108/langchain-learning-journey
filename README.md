@@ -28,6 +28,11 @@ I am learning to build AI applications step by step: starting with basic prompts
 - System and human messages
 - Building practical AI applications
 - Pydantic models and data validation
+- Persistent conversation history with `RunnableWithMessageHistory`
+- Custom chat history backed by Supabase and PostgreSQL JSONB
+- Session-based conversation management
+- Supabase database setup and environment configuration
+- Basic signup/login flow as a learning demonstration
 
 ---
 
@@ -880,6 +885,76 @@ LLM
 
 ---
 
+### 15. Multi-User AI Chatbot with Supabase Persistence
+
+File: `supabase_chatbot.py` (save the supplied chatbot script with this filename)
+
+This project combines a command-line signup/login flow with a LangChain chatbot powered by Google Gemini. It uses `RunnableWithMessageHistory` to attach conversation history to a session and a custom `BaseChatMessageHistory` implementation to load and save serialized messages in Supabase.
+
+The `users` table stores usernames and profile data. The `chat_history` table stores a session ID and a JSONB array of LangChain messages, allowing history to be loaded again after the program exits.
+
+#### Concepts practiced
+
+- Creating a `ChatGoogleGenerativeAI` model with `gemini-3.6-flash`
+- Building a chat prompt with `ChatPromptTemplate` and `MessagesPlaceholder`
+- Wrapping a runnable with `RunnableWithMessageHistory`
+- Implementing `BaseChatMessageHistory` for custom persistent storage
+- Serializing messages with `message_to_dict` and restoring them with `messages_from_dict`
+- Loading and saving user profiles through Supabase
+- Persisting message history in PostgreSQL JSONB
+- Separating a conversation's session ID from the model call
+
+#### Supabase tables
+
+Create these tables in Supabase before running the script. The columns used by the code are:
+
+| Table | Column | Suggested type | Purpose |
+|---|---|---|---|
+| `users` | `username` | `text`, unique or primary key | Login name used by the script |
+| `users` | `profile` | `jsonb` | User profile (the demo code includes account details here) |
+| `chat_history` | `session_id` | `text`, primary key | Identifies the stored conversation session |
+| `chat_history` | `messages` | `jsonb` | Serialized LangChain messages for the session |
+
+Run the following SQL in your Supabase project before starting the chatbot:
+
+1. Open your project in the Supabase Dashboard.
+2. Select **SQL Editor** from the sidebar and choose **New query**.
+3. Paste the SQL below and click **Run**.
+
+```sql
+create table if not exists public.users (
+    username text primary key,
+    profile jsonb not null
+);
+
+create table if not exists public.chat_history (
+    session_id text primary key,
+    messages jsonb not null default '[]'::jsonb
+);
+```
+
+Adjust constraints or add columns only if your script or application needs them. Keep the Supabase secret key on a trusted server; never expose it in a client-side application.
+
+#### Conversation flow
+
+```text
+User signs up or logs in
+          ↓
+Load the user's conversation session
+          ↓
+ChatPromptTemplate + stored messages + current input
+          ↓
+RunnableWithMessageHistory
+          ↓
+ChatGoogleGenerativeAI (gemini-3.6-flash)
+          ↓
+Save updated messages to chat_history.messages (JSONB)
+```
+
+`RunnableWithMessageHistory` retrieves history using the configured session ID, inserts it into the prompt's history placeholder, then records the new human and AI messages through the custom history store.
+
+---
+
 ## Concept Notes: Output Parsers
 
 ### What is a parser?
@@ -1201,15 +1276,21 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-### 4. Add Your Gemini API Key
+### 4. Configure Environment Variables
 
-Create a `.env` file in the project folder:
+Create a `.env` file in the project folder. The existing Gemini examples need `GOOGLE_API_KEY`; the Supabase chatbot also requires the project URL and secret key:
 
 ```env
 GOOGLE_API_KEY=your_google_gemini_api_key_here
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_SECRET_KEY=your_supabase_secret_key_here
 ```
 
-Never upload your `.env` file to GitHub because it contains your private API key.
+Use the Supabase secret/service-role key only in a trusted server-side environment. Never commit `.env` or expose either API key in a public repository or client-side application.
+
+### 5. Prepare Supabase for the Chatbot
+
+Create the `users` and `chat_history` tables described in project 15 before running the Supabase chatbot. The `profile` and `messages` columns should be PostgreSQL `jsonb` fields.
 
 ---
 
@@ -1228,6 +1309,7 @@ python stream_chain.py
 python multi_step_chain.py
 python runnable_sequence_parallel.py
 python stateful_chat.py
+python supabase_chatbot.py
 ```
 
 ---
@@ -1240,6 +1322,7 @@ python stateful_chat.py
 - Pydantic
 - `langchain-google-genai`
 - `python-dotenv`
+- Supabase Python client (`supabase`)
 
 ---
 
