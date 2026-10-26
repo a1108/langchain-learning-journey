@@ -1313,6 +1313,78 @@ python supabase_chatbot.py
 ```
 
 ---
+## RAG — Document Loaders and Generators
+
+I'm exploring how LangChain loads documents from different file formats as part of learning Retrieval-Augmented Generation (RAG).
+
+The first step is understanding how documents are loaded, how their content is extracted, and how LangChain represents that content using `Document` objects.
+
+### PDF Generator
+
+**File:** `RAG/generators/generate_pdf.py`
+
+This script generates sample PDF files for testing document loaders.
+
+It creates:
+- `library_notice_single.pdf` — a single-page PDF.
+- `library_notice_multiple.pdf` — a three-page PDF.
+
+Generating sample files makes it easier to test document loaders with predictable content.
+
+### Custom PDF Loader
+
+**File:** `RAG/loaders/load_pdf.py`
+
+This example implements a custom `PDFPageLoader` using LangChain's `BaseLoader` and `pypdf`.
+
+Concepts practiced:
+
+- Creating a custom document loader by extending `BaseLoader`.
+- Reading PDF files using `PdfReader`.
+- Using `lazy_load()` to yield documents page by page.
+- Creating one LangChain `Document` for each PDF page.
+- Extracting text from PDF pages.
+- Storing source information and page details in document metadata.
+- Inspecting the extracted content and metadata.
+
+### Understanding the Document Object
+
+Each page is represented as a LangChain `Document` containing:
+
+- `page_content` — the text extracted from the page.
+- `metadata` — information about the source PDF, page index, and total number of pages.
+
+Example:
+
+```python
+Document(
+    page_content="Library Notice\nLibrary opens at 8 AM",
+    metadata={
+        "source": "library_notice_single.pdf",
+        "source_type": "pdf",
+        "page": 0,
+        "total_pages": 1,
+    },
+)
+```
+
+The page index starts at `0`, so the first page has index `0`, while its displayed page number is `1`.
+
+### Run the Example
+
+Run these commands from the repository root:
+
+```bash
+# Generate the sample PDFs
+python -m RAG.generators.generate_pdf
+
+# Load the generated PDFs
+python -m RAG.loaders.load_pdf
+```
+
+The loader prints each PDF's page number, extraction status, extracted text, and metadata.
+
+---
 
 ## Technologies Used
 
