@@ -1313,76 +1313,228 @@ python supabase_chatbot.py
 ```
 
 ---
-## RAG — Document Loaders and Generators
+# RAG — Document Generation and Loading
 
-I'm exploring how LangChain loads documents from different file formats as part of learning Retrieval-Augmented Generation (RAG).
+## Overview
 
-The first step is understanding how documents are loaded, how their content is extracted, and how LangChain represents that content using `Document` objects.
+This module demonstrates how to generate sample PDF, TXT, and CSV files and load them into LangChain `Document` objects using custom document loaders.
+
+The implementation uses LangChain's `BaseLoader` and `Document` classes to understand how different file formats are converted into documents before moving to the next stages of a Retrieval-Augmented Generation (RAG) pipeline.
+
+## Project Structure
+
+```text
+RAG/
+├── generators/
+│   ├── generate_pdf.py
+│   ├── generate_text.py
+│   └── generate_csv.py
+├── loaders/
+│   ├── pdf_loader.py
+│   ├── text_loader.py
+│   ├── csv_loader.py
+│   └── document_loader.py
+└── data/
+    └── generated/
+        ├── library_notice_single.pdf
+        ├── library_notice_multiple.pdf
+        ├── library_notice.txt
+        └── students.csv
+```
+
+## 1. Document Generation
+
+Sample files are generated automatically when `document_loader.py` runs.
 
 ### PDF Generator
 
-**File:** `RAG/generators/generate_pdf.py`
+**File:** `generators/generate_pdf.py`
 
-This script generates sample PDF files for testing document loaders.
+- Generates single-page and multi-page PDF files.
+- Uses ReportLab's `canvas` API to write text to each page.
+- Supports multiple lines per page.
+- Saves generated PDFs in `data/generated/`.
 
-It creates:
-- `library_notice_single.pdf` — a single-page PDF.
-- `library_notice_multiple.pdf` — a three-page PDF.
+### Text Generator
 
-Generating sample files makes it easier to test document loaders with predictable content.
+**File:** `generators/generate_text.py`
 
-### Custom PDF Loader
+- Generates a text file containing library information and rules.
+- Saves the file in `data/generated/`.
 
-**File:** `RAG/loaders/load_pdf.py`
+### CSV Generator
 
-This example implements a custom `PDFPageLoader` using LangChain's `BaseLoader` and `pypdf`.
+**File:** `generators/generate_csv.py`
 
-Concepts practiced:
+- Generates a CSV file containing student records.
+- Uses columns such as `student_id`, `name`, `course`, and `fee`.
+- Saves the file in `data/generated/`.
 
-- Creating a custom document loader by extending `BaseLoader`.
-- Reading PDF files using `PdfReader`.
-- Using `lazy_load()` to yield documents page by page.
-- Creating one LangChain `Document` for each PDF page.
-- Extracting text from PDF pages.
-- Storing source information and page details in document metadata.
-- Inspecting the extracted content and metadata.
+## 2. Custom Document Loaders
 
-### Understanding the Document Object
+Each loader extends LangChain's `BaseLoader` and implements `lazy_load()`.
 
-Each page is represented as a LangChain `Document` containing:
+### PDF Page Loader
 
-- `page_content` — the text extracted from the page.
-- `metadata` — information about the source PDF, page index, and total number of pages.
+**File:** `loaders/pdf_loader.py`
 
-Example:
+Class: `PDFPageLoader`
+
+- Uses `pypdf.PdfReader` to read PDF files.
+- Creates one LangChain `Document` per PDF page.
+- Extracts page text and attaches metadata.
+
+Example metadata:
 
 ```python
-Document(
-    page_content="Library Notice\nLibrary opens at 8 AM",
-    metadata={
-        "source": "library_notice_single.pdf",
-        "source_type": "pdf",
-        "page": 0,
-        "total_pages": 1,
-    },
-)
+{
+    "source": "library_notice_multiple.pdf",
+    "source_type": "pdf",
+    "page": 0,
+    "total_pages": 3
+}
 ```
 
-The page index starts at `0`, so the first page has index `0`, while its displayed page number is `1`.
+The page index starts at `0`, while the displayed page number starts at `1`.
 
-### Run the Example
+### Text File Loader
 
-Run these commands from the repository root:
+**File:** `loaders/text_loader.py`
+
+Class: `TextFileLoader`
+
+- Reads a text file using UTF-8 encoding.
+- Creates one `Document` for the entire text file.
+- Stores the source path and source type in metadata.
+
+Example metadata:
+
+```python
+{
+    "source": "library_notice.txt",
+    "source_type": "text"
+}
+```
+
+### CSV File Loader
+
+**File:** `loaders/csv_loader.py`
+
+Class: `CSVFileLoader`
+
+- Reads CSV files using Python's `csv.DictReader`.
+- Converts each CSV row into a separate `Document`.
+- Stores row information and selected fields in metadata.
+
+Example metadata:
+
+```python
+{
+    "source": "students.csv",
+    "source_type": "csv",
+    "row": 0,
+    "student_id": "S101",
+    "course": "Python"
+}
+```
+
+Each row becomes an individual document, making it possible to retrieve specific records later.
+
+## 3. Generic Document Loader
+
+**File:** `loaders/document_loader.py`
+
+The generic loader coordinates the complete workflow.
+
+Responsibilities:
+
+1. Generate the sample PDF, TXT, and CSV files.
+2. Identify supported file types using their file extensions.
+3. Select the appropriate custom loader.
+4. Load the content into LangChain `Document` objects.
+5. Print document content and metadata.
+6. Display the final document count.
+
+The `get_loader()` function selects the loader based on the file extension:
+
+| File extension | Loader |
+|---|---|
+| `.pdf` | `PDFPageLoader` |
+| `.txt` | `TextFileLoader` |
+| `.csv` | `CSVFileLoader` |
+
+The `load_documents()` function processes files by type, prints their content and metadata, and returns a combined list of documents.
+
+## 4. Run the Example
+
+Run the following command from the repository root:
 
 ```bash
-# Generate the sample PDFs
-python -m RAG.generators.generate_pdf
-
-# Load the generated PDFs
-python -m RAG.loaders.load_pdf
+python3 -m RAG.loaders.document_loader
 ```
 
-The loader prints each PDF's page number, extraction status, extracted text, and metadata.
+The execution flow is:
+
+```text
+Generate Sample Files
+        |
+        v
+Discover Supported Files
+        |
+        v
+Select the Appropriate Loader
+        |
+        v
+Load Content into Documents
+        |
+        v
+Display Content and Metadata
+        |
+        v
+Print Final Summary
+```
+
+## 5. Expected Output
+
+The program displays four main sections:
+
+- **PDF DOCUMENT** — filename, page number, extraction status, content, and metadata.
+- **TEXT DOCUMENT** — text content and metadata.
+- **CSV DOCUMENT** — each row's content and metadata.
+- **FINAL SUMMARY** — the total number of loaded documents.
+
+With the current sample data, the expected document count is:
+
+| Source | Files | Documents |
+|---|---:|---:|
+| Single-page PDF | 1 | 1 |
+| Three-page PDF | 1 | 3 |
+| Text file | 1 | 1 |
+| CSV file with three rows | 1 | 3 |
+| **Total** | **4** | **8** |
+
+The important concept is that **the number of LangChain `Document` objects depends on the loader's implementation, not just the number of input files.**
+
+- PDF: one document per page.
+- TXT: one document per file.
+- CSV: one document per data row.
+
+## 6. Key Concepts Learned
+
+- `BaseLoader`: the base class for implementing custom document loaders.
+- `Document`: represents text content along with metadata.
+- `lazy_load()`: yields documents incrementally.
+- `load()`: loads documents into a list.
+- Metadata: stores source information and useful attributes for filtering and traceability.
+- File-type routing: selects the appropriate loader based on the file extension.
+- Structured data loading: converts CSV records into individual documents.
+
+## 7. Important Design Decisions
+
+- Keep generator modules focused on generating files.
+- Keep individual loader modules focused on loading and converting data into `Document` objects.
+- Avoid calling generator functions or loading files automatically at the top level of imported modules.
+- Coordinate generation, loading, and output from `document_loader.py` to avoid duplicate execution during imports.
 
 ---
 
