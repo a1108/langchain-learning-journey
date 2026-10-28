@@ -3,9 +3,9 @@ from pathlib import Path
 
 from langchain_core.documents import Document
 
-from RAG.generators.generate_pdf import generate_pdf
-from RAG.generators.generate_text import generate_text
-from RAG.generators.generate_csv import generate_csv
+from RAG.generators.generate_pdf import generate_sample_pdfs
+from RAG.generators.generate_text import generate_sample_text
+from RAG.generators.generate_csv import generate_sample_csv
 
 from RAG.loaders.pdf_loader import PDFPageLoader
 from RAG.loaders.text_loader import TextFileLoader
@@ -18,78 +18,6 @@ from RAG.loaders.csv_loader import CSVFileLoader
 
 RAG_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = RAG_DIR / "data" / "generated"
-
-
-# ========================================
-# GENERATE SAMPLE FILES
-# ========================================
-
-# Generate single-page PDF
-generate_pdf(
-    "library_notice_single.pdf",
-    [[
-        "Library Notice",
-        "Library opens at 8 AM",
-        "Library closes at 6 PM",
-    ]],
-)
-
-# Generate multiple-page PDF
-generate_pdf(
-    "library_notice_multiple.pdf",
-    [
-        [
-            "Page 1: Library Notice",
-            "Library opens at 8 AM",
-            "Library closes at 6 PM",
-        ],
-        [
-            "Page 2: Library Rules",
-            "Maintain silence in the library",
-            "Return books on time",
-        ],
-        [
-            "Page 3: Contact Information",
-            "Email: library@example.com",
-            "Phone: 1234567890",
-        ],
-    ],
-)
-
-# Generate text file
-generate_text(
-    "library_notice.txt",
-    """Library Notice
-Library opens at 8 AM
-Library closes at 6 PM
-Maintain silence in the library
-Return books on time""",
-)
-
-# Generate CSV file
-generate_csv(
-    "students.csv",
-    [
-        {
-            "student_id": "S101",
-            "name": "Ravi",
-            "course": "Python",
-            "fee": "5000",
-        },
-        {
-            "student_id": "S102",
-            "name": "Priya",
-            "course": "Java",
-            "fee": "6000",
-        },
-        {
-            "student_id": "S103",
-            "name": "Rahul",
-            "course": "Data Science",
-            "fee": "12000",
-        },
-    ],
-)
 
 
 # ========================================
@@ -120,9 +48,9 @@ def get_loader(file_path):
 # ========================================
 
 def load_documents(directory) -> list[Document]:
-    # Find all supported files in the directory
     directory = Path(directory)
 
+    # Find all supported files
     file_paths = sorted(
         file_path
         for file_path in directory.iterdir()
@@ -235,6 +163,15 @@ def load_documents(directory) -> list[Document]:
     print("========================================")
 
     return documents
+
+
+# ========================================
+# GENERATE SAMPLE FILES
+# ========================================
+
+generate_sample_pdfs()
+generate_sample_text()
+generate_sample_csv()
 
 
 # ========================================
